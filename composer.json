@@ -1,5 +1,5 @@
 {
-    "name": "ripenecommerce/magento2-postmark",
+    "name": "mandytech/magento2-postmark",
     "description": "Postmark for Magento 2",
     "type": "magento2-module",
     "authors": [
@@ -14,14 +14,20 @@
             "email": "sbuchanan@ripen.com",
             "homepage": "https://ripen.com",
             "role": "Developer"
+        },
+        {
+            "name": "Mandy Technologies",
+            "email": "developer@mandytechnologies.com",
+            "homepage": "https://mandytechnologies.com",
+            "role": "Developer"
         }
     ],
     "license": [
         "OSL-3.0"
     ],
     "support": {
-        "wiki": "https://github.com/ripenecommerce/magento2-postmark/wiki",
-        "forum": "https://github.com/ripenecommerce/magento2-postmark/issues"
+        "wiki": "https://github.com/mandytechnologies/magento2-postmark/wiki",
+        "forum": "https://github.com/mandytechnologies/magento2-postmark/issues"
     },
     "require": {
         "php": "~8.1.0||~8.2.0||~8.3.0",
