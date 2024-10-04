@@ -19,35 +19,39 @@
  */
 namespace Mandytech\Postmark\Helper;
 
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+use Magento\Framework\App\Helper\Context;
+use Magento\Framework\ObjectManagerInterface;
+use Psr\Log\LoggerInterface;
+use Magento\Framework\App\Helper\AbstractHelper;
+
+class Data extends AbstractHelper
 {
     const XML_PATH_ENABLED = 'postmark/settings/enabled';
     const XML_PATH_DEBUG_MODE = 'postmark/settings/debug_mode';
     const XML_PATH_APIKEY = 'postmark/settings/apikey';
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $_logger;
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
     /**
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Magento\Framework\ObjectManagerInterface
+     * @param Context $context
+     * @param LoggerInterface $logger
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Psr\Log\LoggerInterface $logger,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        Context $context,
+        LoggerInterface $logger,
+        ObjectManagerInterface $objectManager
     ) {
         $this->_logger = $logger;
         $this->_objectManager = $objectManager;
-        $this->_subscribed = array();
         parent::__construct($context);
     }
 
@@ -101,8 +105,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * @param $msg
+     * @param string $level
      */
-    public function log($msg, $level = \Psr\Log\LogLevel::INFO)
+    public function log($msg, string $level = \Psr\Log\LogLevel::INFO)
     {
         $this->_logger->log($level, $msg);
     }

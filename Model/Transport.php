@@ -21,34 +21,40 @@ namespace Mandytech\Postmark\Model;
 
 use Laminas\Mail\Message as LaminasMessage;
 use Laminas\Mail\Headers as LaminasHeaders;
+use Magento\Framework\Exception\MailException;
+use Magento\Framework\Mail\EmailMessageInterface;
+use Mandytech\Postmark\Helper\Data;
+use Mandytech\Postmark\Model\Transport\Postmark;
+use Magento\Framework\Mail\TransportInterface;
+use Throwable;
 
-class Transport extends \Magento\Framework\Mail\Transport implements \Magento\Framework\Mail\TransportInterface
+class Transport extends \Magento\Framework\Mail\Transport implements TransportInterface
 {
     /**
-     * @var \Magento\Framework\Mail\MailMessageInterface
+     * @var EmailMessageInterface
      */
     protected $message;
 
     /**
-     * @var \Mandytech\Postmark\Helper\Data
+     * @var Data
      */
     protected $helper;
 
     /**
-     * @var \Mandytech\Postmark\Model\Transport\Postmark
+     * @var Postmark
      */
     protected $transportPostmark;
 
     /**
-     * @param \Mandytech\Postmark\Helper\Data $helper
-     * @param \Mandytech\Postmark\Model\Transport\Postmark $transportPostmark
-     * @param \Magento\Framework\Mail\MailMessageInterface $message
+     * @param Data $helper
+     * @param Postmark $transportPostmark
+     * @param EmailMessageInterface $message
      * @param null $parameters
      */
     public function __construct(
-        \Mandytech\Postmark\Helper\Data $helper,
-        \Mandytech\Postmark\Model\Transport\Postmark $transportPostmark,
-        \Magento\Framework\Mail\MailMessageInterface $message,
+        Data $helper,
+        Postmark $transportPostmark,
+        EmailMessageInterface $message,
         $parameters = null
     ) {
         $this->helper  = $helper;
@@ -65,7 +71,7 @@ class Transport extends \Magento\Framework\Mail\Transport implements \Magento\Fr
      * Send a mail using this transport
      *
      * @return void
-     * @throws \Magento\Framework\Exception\MailException
+     * @throws MailException|Throwable
      */
     public function sendMessage()
     {
@@ -85,7 +91,7 @@ class Transport extends \Magento\Framework\Mail\Transport implements \Magento\Fr
 
             $this->transportPostmark->send($message);
         } catch (\Exception $e) {
-            throw new \Magento\Framework\Exception\MailException(new \Magento\Framework\Phrase($e->getMessage()), $e);
+            throw new MailException(new \Magento\Framework\Phrase($e->getMessage()), $e);
         }
     }
 }

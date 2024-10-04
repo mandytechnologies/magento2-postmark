@@ -19,30 +19,35 @@
  */
 namespace Mandytech\Postmark\Model\Plugin;
 
+use Closure;
+use Magento\Framework\Mail\TransportInterface;
+use Mandytech\Postmark\Helper\Data;
+use Mandytech\Postmark\Model\TransportFactory;
+
 class TransportInterfaceFactory
 {
     /**
      * Transport Factory
      *
-     * @var \Mandytech\Postmark\Model\TransportFactory
+     * @var TransportFactory
      */
     protected $moduleTransportFactory;
 
     /**
      * Helper class
      *
-     * @var \Mandytech\Postmark\Helper\Data
+     * @var Data
      */
     protected $moduleHelper;
 
     /**
      * TransportBuilder constructor.
-     * @param \Mandytech\Postmark\Helper\Data $moduleHelper
-     * @param \Mandytech\Postmark\Model\TransportFactory $moduleTransportFactory
+     * @param Data $moduleHelper
+     * @param TransportFactory $moduleTransportFactory
      */
     public function __construct(
-        \Mandytech\Postmark\Helper\Data $moduleHelper,
-        \Mandytech\Postmark\Model\TransportFactory $moduleTransportFactory
+        Data $moduleHelper,
+        TransportFactory $moduleTransportFactory
     ) {
         $this->moduleHelper = $moduleHelper;
         $this->moduleTransportFactory = $moduleTransportFactory;
@@ -52,21 +57,21 @@ class TransportInterfaceFactory
      * Replace mail transport with Postmark if needed
      *
      * @param \Magento\Framework\Mail\TransportInterfaceFactory $subject
-     * @param \Closure $proceed
+     * @param Closure $proceed
      * @param array $data
      *
-     * @return \Magento\Framework\Mail\TransportInterface
+     * @return TransportInterface
      */
     public function aroundCreate(
         \Magento\Framework\Mail\TransportInterfaceFactory $subject,
-        \Closure $proceed,
+        Closure $proceed,
         array $data = []
     ) {
         if ($this->isPostmarkEnabled()) {
             return $this->moduleTransportFactory->create($data);
         }
 
-        /** @var \Magento\Framework\Mail\TransportInterface $transport */
+        /** @var TransportInterface $transport */
         return $proceed($data);
     }
 

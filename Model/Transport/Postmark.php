@@ -19,11 +19,21 @@
  */
 namespace Mandytech\Postmark\Model\Transport;
 
+use Laminas\Http\Client;
+use Laminas\Http\Response;
+use Laminas\Mail\AddressList;
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\GenericHeader;
+use Laminas\Mail\Header\Subject;
+use Laminas\Mail\Message;
+use Laminas\Mail\Transport\TransportInterface;
+use Mandytech\Postmark\Helper\Data;
 use Psr\Log\LogLevel;
 use Mandytech\Postmark\Model\Transport\Exception as PostmarkTransportException;
 use Laminas\Mime\Mime;
+use Throwable;
 
-class Postmark implements \Laminas\Mail\Transport\TransportInterface
+class Postmark implements TransportInterface
 {
     /**
      * Postmark API Uri
@@ -43,16 +53,16 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     protected $apiKey = null;
 
     /**
-     * @var \Mandytech\Postmark\Helper\Data
+     * @var Data
      */
     protected $helper;
 
     /**
-     * @param \Mandytech\Postmark\Helper\Data $helper
-     * @throws \Mandytech\Postmark\Model\Transport\Exception
+     * @param Data $helper
+     * @throws Exception
      */
     public function __construct(
-        \Mandytech\Postmark\Helper\Data $helper
+        Data $helper
     ) {
         $this->helper = $helper;
 
@@ -67,11 +77,11 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      * Send request to Postmark service
      *
      * @link http://developer.postmarkapp.com/developer-build.html
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return void
-     * @throws \Mandytech\Postmark\Model\Transport\Exception
+     * @throws Exception|Throwable
      */
-    public function send(\Laminas\Mail\Message $message)
+    public function send(Message $message)
     {
         $recipients = $this->getRecipients($message);
         $bodyVersions = $this->getBody($message);
@@ -93,7 +103,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
                 ->setRawBody(json_encode($data))
                 ->send();
             $this->parseResponse($response);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $errorMessage = $e->getMessage();
             throw $e;
         } finally {
@@ -109,7 +119,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      * Get a HTTP client instance
      *
      * @param string $path
-     * @return \Laminas\Http\Client
+     * @return Client
      */
     protected function prepareHttpClient($path)
     {
@@ -119,11 +129,11 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Returns a HTTP client object
      *
-     * @return \Laminas\Http\Client
+     * @return Client
      */
     public function getHttpClient()
     {
-        $client = new \Laminas\Http\Client();
+        $client = new Client();
         $client->setHeaders([
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
@@ -138,11 +148,11 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      *
      * @see https://postmarkapp.com/developer/api/overview#response-codes  (possible HTTP status codes)
      *
-     * @param \Laminas\Http\Response $response
+     * @param Response $response
      * @return array
-     * @throws \Mandytech\Postmark\Model\Transport\Exception
+     * @throws Exception
      */
-    protected function parseResponse(\Laminas\Http\Response $response)
+    protected function parseResponse(Response $response)
     {
         $result = json_decode($response->getBody(), true);
 
@@ -175,10 +185,10 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Get mail From
      *
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return string|null
      */
-    public function getFrom(\Laminas\Mail\Message $message)
+    public function getFrom(Message $message)
     {
         $sender = $message->getSender();
         if ($sender instanceof \Laminas\Mail\Address\AddressInterface) {
@@ -200,11 +210,11 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Get mail recipients (To, Cc, and Bcc)
      *
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return array
-     * @throws \Mandytech\Postmark\Model\Transport\Exception
+     * @throws Exception
      */
-    public function getRecipients(\Laminas\Mail\Message $message)
+    public function getRecipients(Message $message)
     {
         $recipients = [
             'To' => $this->addressListToArray($message->getTo()),
@@ -232,10 +242,10 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Convert address list to simple array
      *
-     * @param \Laminas\Mail\AddressList $addressList
+     * @param AddressList $addressList
      * @return array
      */
-    protected function addressListToArray(\Laminas\Mail\AddressList $addressList)
+    protected function addressListToArray(AddressList $addressList)
     {
         $addresses = [];
         foreach ($addressList as $address) {
@@ -247,10 +257,10 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Get mail Reply To
      *
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return string
      */
-    public function getReplyTo(\Laminas\Mail\Message $message)
+    public function getReplyTo(Message $message)
     {
         $addresses = $message->getReplyTo();
 
@@ -265,12 +275,12 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Get mail subject
      *
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return string
      */
-    public function getSubject(\Laminas\Mail\Message $message)
+    public function getSubject(Message $message)
     {
-        /** @var \Laminas\Mail\Header\Subject $subjectHeader */
+        /** @var Subject $subjectHeader */
         $subjectHeader = $message->getHeaders()->get('Subject');
 
         if (! $subjectHeader) {
@@ -281,11 +291,11 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     }
 
     /**
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return array
-     * @throws \Mandytech\Postmark\Model\Transport\Exception
+     * @throws Exception
      */
-    public function getBody(\Laminas\Mail\Message $message)
+    public function getBody(Message $message)
     {
         $bodyVersions = [
             Mime::TYPE_HTML => '',
@@ -301,7 +311,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
                 }
             }
         } else {
-            /** @var \Laminas\Mail\Header\ContentType $contentTypeHeader */
+            /** @var ContentType $contentTypeHeader */
             $contentTypeHeader = $message->getHeaders()->get('ContentType');
             $contentType = $contentTypeHeader ? $contentTypeHeader->getType() : Mime::TYPE_TEXT;
             $bodyVersions[$contentType] = (string) $body;
@@ -319,7 +329,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      *
      * @return string
      */
-    public function getTags(\Laminas\Mail\Message $message)
+    public function getTags(Message $message)
     {
         $headers = $message->getHeaders();
 
@@ -328,7 +338,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
         if (! is_array($tagsHeaders)) $tagsHeaders = [];
 
         $tags = [];
-        /** @var \Laminas\Mail\Header\GenericHeader $tagsHeader */
+        /** @var GenericHeader $tagsHeader */
         foreach ($tagsHeaders as $tagsHeader) {
             $tags[] = $tagsHeader->getFieldValue();
         }
@@ -338,10 +348,10 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * Get mail Attachments
      *
-     * @param \Laminas\Mail\Message $message
+     * @param Message $message
      * @return array
      */
-    public function getAttachments(\Laminas\Mail\Message $message)
+    public function getAttachments(Message $message)
     {
         $body = $message->getBody();
         if (! $body instanceof \Laminas\Mime\Message) return [];

@@ -19,28 +19,35 @@
  */
 namespace Mandytech\Postmark\Test\Unit\Model\Transport;
 
-class PostmarkTest extends \PHPUnit\Framework\TestCase
+use Laminas\Http\Client\Adapter\AdapterInterface;
+use Laminas\Mime\Mime;
+use Mandytech\Postmark\Helper\Data;
+use Mandytech\Postmark\Model\Transport\Postmark;
+use PHPUnit\Framework\TestCase;
+use Laminas\Http\Client\Adapter\Test;
+
+class PostmarkTest extends TestCase
 {
     /**
-     * @var \Laminas_Http_Client_Adapter_Interface
+     * @var AdapterInterface
      */
     protected $adapter;
 
     /**
-     * @var \Mandytech\Postmark\Model\Transport\Postmark;
+     * @var Postmark;
      */
     protected $transport;
 
     /**
-     * @var \Mandytech\Postmark\Helper\Data
+     * @var Data
      */
     protected $helper;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->adapter = new \Laminas_Http_Client_Adapter_Test();
+        $this->adapter = new Test();
 
-        $this->helper = $this->getMockBuilder(\Mandytech\Postmark\Helper\Data::class)
+        $this->helper = $this->getMockBuilder(Data::class)
             ->setMethods(['getApiKey'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -49,7 +56,7 @@ class PostmarkTest extends \PHPUnit\Framework\TestCase
             ->method('getApiKey')
             ->will($this->returnValue('test-api-key'));
 
-        $this->transport = new \Mandytech\Postmark\Model\Transport\Postmark($this->helper);
+        $this->transport = new Postmark($this->helper);
         $this->transport->getHttpClient()->setAdapter($this->adapter);
     }
 
@@ -72,7 +79,7 @@ class PostmarkTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHttpClient()
     {
-        $this->assertInstanceOf('\Laminas_Http_Client', $this->transport->getHttpClient());
+        $this->assertInstanceOf('\Laminas\Http\Client', $this->transport->getHttpClient());
     }
 
     public function testGetFrom()
@@ -195,8 +202,8 @@ class PostmarkTest extends \PHPUnit\Framework\TestCase
 
         $at = $mail->createAttachment('test');
         $at->type        = 'image/gif';
-        $at->disposition = \Laminas_Mime::DISPOSITION_INLINE;
-        $at->encoding    = \Laminas_Mime::ENCODING_BASE64;
+        $at->disposition = Mime::DISPOSITION_INLINE;
+        $at->encoding    = Mime::ENCODING_BASE64;
         $at->filename    = 'test.gif';
         $this->transport->setMail($mail);
 

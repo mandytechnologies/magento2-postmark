@@ -19,40 +19,47 @@
  */
 namespace Mandytech\Postmark\Test\Unit\Model;
 
+use Magento\Framework\Mail\EmailMessage;
+use Mandytech\Postmark\Helper\Data;
+use Mandytech\Postmark\Model\Transport;
+use Mandytech\Postmark\Model\Transport\Exception;
+use Mandytech\Postmark\Model\Transport\Postmark;
+use PHPUnit\Framework\MockObject\MockObject;
+
 class TransportTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $_helper;
 
     /**
-     * @var \Mandytech\Postmark\Model\Transport
+     * @var Transport
      */
     private $_transport;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     private $_transportPostmarkMock;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->_helper = $this->getMockBuilder(\Mandytech\Postmark\Helper\Data::class)
+        $this->_helper = $this->getMockBuilder(Data::class)
             ->setMethods(['canUse'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_message = $this->getMockBuilder(\Magento\Framework\Mail\Message::class)
+        $this->_message = $this->getMockBuilder(EmailMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_transportPostmarkMock = $this->getMockBuilder(\Mandytech\Postmark\Model\Transport\Postmark::class)
+        $this->_transportPostmarkMock = $this->getMockBuilder(Postmark::class)
             ->setMethods(['send'])
             ->disableOriginalConstructor()
             ->setConstructorArgs(['helper' => $this->_helper])
             ->getMock();
-        $this->_transport = new \Mandytech\Postmark\Model\Transport($this->_message, $this->_transportPostmarkMock, $this->_helper);
+        $this->_transport = new Transport($this->_message, $this->_transportPostmarkMock, $this->_helper);
     }
 
     public function testSendMessage()
@@ -76,7 +83,7 @@ class TransportTest extends \PHPUnit\Framework\TestCase
 
         $this->_transportPostmarkMock->expects($this->once())
             ->method('send')
-            ->will($this->throwException(new \Mandytech\Postmark\Model\Transport\Exception('test')));
+            ->will($this->throwException(new Exception('test')));
 
         try {
             $this->_transport->sendMessage();

@@ -19,26 +19,31 @@
  */
 namespace Mandytech\Postmark\Test\Unit\Helper;
 
-class DataTest extends \PHPUnit\Framework\TestCase
+use Mandytech\Postmark\Helper\Data;
+use PHPUnit\Framework\MockObject\MockObject;
+use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use PHPUnit\Framework\TestCase;
+
+class DataTest extends TestCase
 {
     /**
-     * @var \Mandytech\Postmark\Helper\Data
+     * @var Data
      */
     private $_helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $_scopeConfig;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject
      */
     protected $_logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
+        $objectManagerHelper = new ObjectManager($this);
         $className = 'Mandytech\Postmark\Helper\Data';
         $arguments = $objectManagerHelper->getConstructArguments($className);
 
@@ -81,12 +86,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(Data::XML_PATH_ENABLED)
             ->will($this->returnValue(true));
 
         $this->_scopeConfig->expects($this->at(1))
             ->method('getValue')
-            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_APIKEY)
+            ->with(Data::XML_PATH_APIKEY)
             ->will($this->returnValue('test-api-key'));
 
         $this->assertTrue($this->_helper->canUse($store));
@@ -97,12 +102,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(Data::XML_PATH_ENABLED)
             ->will($this->returnValue(true));
 
         $this->_scopeConfig->expects($this->at(1))
             ->method('getValue')
-            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_APIKEY)
+            ->with(Data::XML_PATH_APIKEY)
             ->will($this->returnValue(null));
 
         $this->assertFalse($this->_helper->canUse($store));
@@ -113,7 +118,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(Data::XML_PATH_ENABLED)
             ->will($this->returnValue(false));
 
         $this->assertFalse($this->_helper->canUse($store));
