@@ -2,7 +2,7 @@ Magento 2 Postmark Integration
 ==================
 A Magento module to use Postmark instead of Core e-mail module.
 
-Forked from a module by [Sumo Heavy](https://www.sumoheavy.com/) that has since been taken offline.
+Forked from a module by [Ripen](https://www.ripen.com/) that has since been taken offline.
 
 ## How it works
 This module overwrites the Magento e-mail model so that outgoing mail is passed through Postmark.
