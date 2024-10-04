@@ -9,15 +9,15 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
  * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
  * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Ripen\Postmark\Model;
+namespace Mandytech\Postmark\Model;
 
 use Laminas\Mail\Message as LaminasMessage;
 use Laminas\Mail\Headers as LaminasHeaders;
@@ -30,24 +30,24 @@ class Transport extends \Magento\Framework\Mail\Transport implements \Magento\Fr
     protected $message;
 
     /**
-     * @var \Ripen\Postmark\Helper\Data
+     * @var \Mandytech\Postmark\Helper\Data
      */
     protected $helper;
 
     /**
-     * @var \Ripen\Postmark\Model\Transport\Postmark
+     * @var \Mandytech\Postmark\Model\Transport\Postmark
      */
     protected $transportPostmark;
 
     /**
-     * @param \Ripen\Postmark\Helper\Data $helper
-     * @param \Ripen\Postmark\Model\Transport\Postmark $transportPostmark
+     * @param \Mandytech\Postmark\Helper\Data $helper
+     * @param \Mandytech\Postmark\Model\Transport\Postmark $transportPostmark
      * @param \Magento\Framework\Mail\MailMessageInterface $message
      * @param null $parameters
      */
     public function __construct(
-        \Ripen\Postmark\Helper\Data $helper,
-        \Ripen\Postmark\Model\Transport\Postmark $transportPostmark,
+        \Mandytech\Postmark\Helper\Data $helper,
+        \Mandytech\Postmark\Model\Transport\Postmark $transportPostmark,
         \Magento\Framework\Mail\MailMessageInterface $message,
         $parameters = null
     ) {

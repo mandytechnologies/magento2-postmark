@@ -5,7 +5,7 @@
          bootstrap="dev/tests/unit/framework/bootstrap.php"
         >
     <testsuite name="Magento Unit Tests">
-        <directory suffix="Test.php">app/code/Ripen/Postmark/Test/Unit</directory>
+        <directory suffix="Test.php">app/code/Mandytech/Postmark/Test/Unit</directory>
     </testsuite>
     <php>
         <ini name="date.timezone" value="America/Los_Angeles"/>
@@ -13,9 +13,9 @@
     </php>
     <filter>
         <whitelist>
-            <directory suffix=".php">app/code/Ripen/Postmark</directory>
+            <directory suffix=".php">app/code/Mandytech/Postmark</directory>
             <exclude>
-                <directory suffix=".php">app/code/Ripen/*/Test</directory>
+                <directory suffix=".php">app/code/Mandytech/*/Test</directory>
             </exclude>
         </whitelist>
     </filter>

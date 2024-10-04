@@ -9,20 +9,20 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
  * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
  * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Ripen\Postmark\Test\Unit\Helper;
+namespace Mandytech\Postmark\Test\Unit\Helper;
 
 class DataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \Ripen\Postmark\Helper\Data
+     * @var \Mandytech\Postmark\Helper\Data
      */
     private $_helper;
 
@@ -39,7 +39,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $objectManagerHelper = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
-        $className = 'Ripen\Postmark\Helper\Data';
+        $className = 'Mandytech\Postmark\Helper\Data';
         $arguments = $objectManagerHelper->getConstructArguments($className);
 
         $context = $arguments['context'];
@@ -81,12 +81,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Ripen\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
             ->will($this->returnValue(true));
 
         $this->_scopeConfig->expects($this->at(1))
             ->method('getValue')
-            ->with(\Ripen\Postmark\Helper\Data::XML_PATH_APIKEY)
+            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_APIKEY)
             ->will($this->returnValue('test-api-key'));
 
         $this->assertTrue($this->_helper->canUse($store));
@@ -97,12 +97,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Ripen\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
             ->will($this->returnValue(true));
 
         $this->_scopeConfig->expects($this->at(1))
             ->method('getValue')
-            ->with(\Ripen\Postmark\Helper\Data::XML_PATH_APIKEY)
+            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_APIKEY)
             ->will($this->returnValue(null));
 
         $this->assertFalse($this->_helper->canUse($store));
@@ -113,7 +113,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
         $store = null;
         $this->_scopeConfig->expects($this->at(0))
             ->method('getValue')
-            ->with(\Ripen\Postmark\Helper\Data::XML_PATH_ENABLED)
+            ->with(\Mandytech\Postmark\Helper\Data::XML_PATH_ENABLED)
             ->will($this->returnValue(false));
 
         $this->assertFalse($this->_helper->canUse($store));

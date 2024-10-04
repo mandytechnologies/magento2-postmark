@@ -10,8 +10,8 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
@@ -20,7 +20,7 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Ripen_Postmark" setup_version="1.0.1">
+    <module name="Mandytech_Postmark" setup_version="1.0.1">
         <sequence>
             <module name="Magento_Email"/>
         </sequence>

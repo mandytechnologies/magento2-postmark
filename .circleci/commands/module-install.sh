@@ -2,9 +2,9 @@
 
 directory="$PWD/.circleci/build/"
 
-mkdir -p "$directory"app/code/Ripen/Postmark
-rsync -av --progress "$PWD"/* "$directory"app/code/Ripen/Postmark/ --exclude ".circleci" --exclude ".git"
+mkdir -p "$directory"app/code/Mandytech/Postmark
+rsync -av --progress "$PWD"/* "$directory"app/code/Mandytech/Postmark/ --exclude ".circleci" --exclude ".git"
 
 cd "$directory"
-php bin/magento module:enable Ripen_Postmark
+php bin/magento module:enable Mandytech_Postmark
 php bin/magento setup:upgrade

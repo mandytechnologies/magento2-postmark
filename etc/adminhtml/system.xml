@@ -10,8 +10,8 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
 * @copyright    Copyright (c) Mandy Technologies Pvt Ltd
@@ -24,7 +24,7 @@
         <section id="postmark" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Postmark Integration</label>
             <tab>service</tab>
-            <resource>Ripen_Postmark::config_postmark</resource>
+            <resource>Mandytech_Postmark::config_postmark</resource>
             <group id="settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Settings</label>
                 <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">

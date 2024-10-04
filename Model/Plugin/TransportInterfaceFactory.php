@@ -9,40 +9,40 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
  * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
  * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Ripen\Postmark\Model\Plugin;
+namespace Mandytech\Postmark\Model\Plugin;
 
 class TransportInterfaceFactory
 {
     /**
      * Transport Factory
      *
-     * @var \Ripen\Postmark\Model\TransportFactory
+     * @var \Mandytech\Postmark\Model\TransportFactory
      */
     protected $moduleTransportFactory;
 
     /**
      * Helper class
      *
-     * @var \Ripen\Postmark\Helper\Data
+     * @var \Mandytech\Postmark\Helper\Data
      */
     protected $moduleHelper;
 
     /**
      * TransportBuilder constructor.
-     * @param \Ripen\Postmark\Helper\Data $moduleHelper
-     * @param \Ripen\Postmark\Model\TransportFactory $moduleTransportFactory
+     * @param \Mandytech\Postmark\Helper\Data $moduleHelper
+     * @param \Mandytech\Postmark\Model\TransportFactory $moduleTransportFactory
      */
     public function __construct(
-        \Ripen\Postmark\Helper\Data $moduleHelper,
-        \Ripen\Postmark\Model\TransportFactory $moduleTransportFactory
+        \Mandytech\Postmark\Helper\Data $moduleHelper,
+        \Mandytech\Postmark\Model\TransportFactory $moduleTransportFactory
     ) {
         $this->moduleHelper = $moduleHelper;
         $this->moduleTransportFactory = $moduleTransportFactory;

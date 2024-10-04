@@ -9,15 +9,15 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
  * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
  * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Ripen\Postmark\Test\Unit\Model;
+namespace Mandytech\Postmark\Test\Unit\Model;
 
 class TransportTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +27,7 @@ class TransportTest extends \PHPUnit\Framework\TestCase
     private $_helper;
 
     /**
-     * @var \Ripen\Postmark\Model\Transport
+     * @var \Mandytech\Postmark\Model\Transport
      */
     private $_transport;
 
@@ -38,7 +38,7 @@ class TransportTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->_helper = $this->getMockBuilder(\Ripen\Postmark\Helper\Data::class)
+        $this->_helper = $this->getMockBuilder(\Mandytech\Postmark\Helper\Data::class)
             ->setMethods(['canUse'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,12 +47,12 @@ class TransportTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_transportPostmarkMock = $this->getMockBuilder(\Ripen\Postmark\Model\Transport\Postmark::class)
+        $this->_transportPostmarkMock = $this->getMockBuilder(\Mandytech\Postmark\Model\Transport\Postmark::class)
             ->setMethods(['send'])
             ->disableOriginalConstructor()
             ->setConstructorArgs(['helper' => $this->_helper])
             ->getMock();
-        $this->_transport = new \Ripen\Postmark\Model\Transport($this->_message, $this->_transportPostmarkMock, $this->_helper);
+        $this->_transport = new \Mandytech\Postmark\Model\Transport($this->_message, $this->_transportPostmarkMock, $this->_helper);
     }
 
     public function testSendMessage()
@@ -76,7 +76,7 @@ class TransportTest extends \PHPUnit\Framework\TestCase
 
         $this->_transportPostmarkMock->expects($this->once())
             ->method('send')
-            ->will($this->throwException(new \Ripen\Postmark\Model\Transport\Exception('test')));
+            ->will($this->throwException(new \Mandytech\Postmark\Model\Transport\Exception('test')));
 
         try {
             $this->_transport->sendMessage();

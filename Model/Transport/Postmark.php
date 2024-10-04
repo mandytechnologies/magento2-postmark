@@ -9,18 +9,18 @@
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
  *
- * @category    Ripen
- * @package     Ripen_Postmark
+ * @category    Mandytech
+ * @package     Mandytech_Postmark
  * @copyright   Copyright (c) SUMO Heavy Industries, LLC
  * @copyright   Copyright (c) Ripen, LLC
  * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
  * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
  * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Ripen\Postmark\Model\Transport;
+namespace Mandytech\Postmark\Model\Transport;
 
 use Psr\Log\LogLevel;
-use Ripen\Postmark\Model\Transport\Exception as PostmarkTransportException;
+use Mandytech\Postmark\Model\Transport\Exception as PostmarkTransportException;
 use Laminas\Mime\Mime;
 
 class Postmark implements \Laminas\Mail\Transport\TransportInterface
@@ -43,16 +43,16 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     protected $apiKey = null;
 
     /**
-     * @var \Ripen\Postmark\Helper\Data
+     * @var \Mandytech\Postmark\Helper\Data
      */
     protected $helper;
 
     /**
-     * @param \Ripen\Postmark\Helper\Data $helper
-     * @throws \Ripen\Postmark\Model\Transport\Exception
+     * @param \Mandytech\Postmark\Helper\Data $helper
+     * @throws \Mandytech\Postmark\Model\Transport\Exception
      */
     public function __construct(
-        \Ripen\Postmark\Helper\Data $helper
+        \Mandytech\Postmark\Helper\Data $helper
     ) {
         $this->helper = $helper;
 
@@ -69,7 +69,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      * @link http://developer.postmarkapp.com/developer-build.html
      * @param \Laminas\Mail\Message $message
      * @return void
-     * @throws \Ripen\Postmark\Model\Transport\Exception
+     * @throws \Mandytech\Postmark\Model\Transport\Exception
      */
     public function send(\Laminas\Mail\Message $message)
     {
@@ -140,7 +140,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      *
      * @param \Laminas\Http\Response $response
      * @return array
-     * @throws \Ripen\Postmark\Model\Transport\Exception
+     * @throws \Mandytech\Postmark\Model\Transport\Exception
      */
     protected function parseResponse(\Laminas\Http\Response $response)
     {
@@ -202,7 +202,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
      *
      * @param \Laminas\Mail\Message $message
      * @return array
-     * @throws \Ripen\Postmark\Model\Transport\Exception
+     * @throws \Mandytech\Postmark\Model\Transport\Exception
      */
     public function getRecipients(\Laminas\Mail\Message $message)
     {
@@ -283,7 +283,7 @@ class Postmark implements \Laminas\Mail\Transport\TransportInterface
     /**
      * @param \Laminas\Mail\Message $message
      * @return array
-     * @throws \Ripen\Postmark\Model\Transport\Exception
+     * @throws \Mandytech\Postmark\Model\Transport\Exception
      */
     public function getBody(\Laminas\Mail\Message $message)
     {
