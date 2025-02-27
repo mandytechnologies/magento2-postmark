@@ -1,5 +1,5 @@
 {
-    "name": "mandytech/magento2-postmark",
+    "name": "mandytechnologies/magento2-postmark",
     "description": "Postmark for Magento 2",
     "type": "magento2-module",
     "authors": [
@@ -18,7 +18,7 @@
         {
             "name": "Mandy Technologies",
             "email": "developer@mandytechnologies.com",
-            "homepage": "https://mandytechnologies.com",
+            "homepage": "https://www.mandytechnologies.com",
             "role": "Developer"
         }
     ],
