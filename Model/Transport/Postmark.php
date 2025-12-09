@@ -85,6 +85,8 @@ class Postmark implements TransportInterface
     {
         $recipients = $this->getRecipients($message);
         $bodyVersions = $this->getBody($message);
+        $messageStream = $this->helper->getMessageStream();
+        $messageStream = !empty($messageStream) ? $messageStream : "outbound";
 
         $data = $recipients + [
             'From' => $this->getFrom($message),
@@ -94,6 +96,7 @@ class Postmark implements TransportInterface
             'TextBody' => $bodyVersions[Mime::TYPE_TEXT],
             'Attachments' => $this->getAttachments($message),
             'Tag' => $this->getTags($message),
+            'MessageStream' => $messageStream,
         ];
 
         $errorMessage = null;

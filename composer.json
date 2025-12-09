@@ -20,6 +20,12 @@
             "email": "developer@mandytechnologies.com",
             "homepage": "https://www.mandytechnologies.com",
             "role": "Developer"
+        },
+        {
+            "name": "Jay Williams",
+            "email": "jay@myd3.com",
+            "homepage": "https://myd3.com",
+            "role": "Developer"
         }
     ],
     "license": [
