@@ -19,197 +19,90 @@
  */
 namespace Mandytech\Postmark\Test\Unit\Model\Transport;
 
-use Laminas\Http\Client\Adapter\AdapterInterface;
-use Laminas\Mime\Mime;
 use Mandytech\Postmark\Helper\Data;
 use Mandytech\Postmark\Model\Transport\Postmark;
+use Mandytech\Postmark\Model\Transport\Exception as PostmarkTransportException;
 use PHPUnit\Framework\TestCase;
-use Laminas\Http\Client\Adapter\Test;
+use Symfony\Component\Mime\Email;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class PostmarkTest extends TestCase
 {
-    /**
-     * @var AdapterInterface
-     */
-    protected $adapter;
+    /** @var Data */
+    protected $helper;
 
-    /**
-     * @var Postmark;
-     */
+    /** @var Postmark */
     protected $transport;
 
-    /**
-     * @var Data
-     */
-    protected $helper;
+    /** @var HttpClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $httpClientMock;
 
     public function setUp(): void
     {
-        $this->adapter = new Test();
-
         $this->helper = $this->getMockBuilder(Data::class)
-            ->setMethods(['getApiKey'])
             ->disableOriginalConstructor()
+            ->onlyMethods(['getApiKey', 'getMessageStream', 'isDebugMode', 'log'])
             ->getMock();
 
-        $this->helper->expects($this->once())
-            ->method('getApiKey')
-            ->will($this->returnValue('test-api-key'));
+        $this->helper->method('getApiKey')->willReturn('test-api-key');
+        $this->helper->method('getMessageStream')->willReturn('outbound');
+        $this->helper->method('isDebugMode')->willReturn(false);
 
         $this->transport = new Postmark($this->helper);
-        $this->transport->getHttpClient()->setAdapter($this->adapter);
+
+        // Mock Symfony HttpClient
+        $this->httpClientMock = $this->getMockBuilder(HttpClientInterface::class)
+            ->getMock();
+
+        $this->transport->setHttpClient($this->httpClientMock);
     }
 
-    public function testSendMail()
+    public function testSendEmailSuccess()
     {
-        $mail = new \Laminas_Mail;
+        $email = (new Email())
+            ->from('sender@example.com')
+            ->to('recipient@example.com')
+            ->subject('Test Subject')
+            ->text('Test Text')           // string
+            ->html('<p>Test HTML</p>');  // string
 
-        $this->adapter->setResponse(
-            "HTTP/1.1 200 OK"        . "\r\n" .
-            "Content-type: text/json" . "\r\n" .
-                                       "\r\n" .
-            '{"success": true}'
-        );
+        $responseMock = $this->getMockBuilder(ResponseInterface::class)
+            ->getMock();
+        $responseMock->method('getStatusCode')->willReturn(200);
+        $responseMock->method('toArray')->willReturn(['Message' => 'OK']);
 
-        $this->transport->setMail($mail);
-        $response = $this->transport->_sendMail();
-        $this->assertNotEmpty($response);
-        $this->assertTrue($response['success']);
+        $this->httpClientMock->expects($this->once())
+            ->method('request')
+            ->willReturn($responseMock);
+
+        $this->transport->send($email);
+
+        $this->assertTrue(true); // If no exception is thrown, test passes
     }
 
-    public function testGetHttpClient()
+    public function testSendEmailFailureThrowsException()
     {
-        $this->assertInstanceOf('\Laminas\Http\Client', $this->transport->getHttpClient());
-    }
+        $this->expectException(PostmarkTransportException::class);
 
-    public function testGetFrom()
-    {
-        $mail = new \Laminas_Mail;
+        $email = (new Email())
+            ->from('sender@example.com')
+            ->to('recipient@example.com')
+            ->subject('Test Subject')
+            ->text('Test Text');
 
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getFrom());
+        $responseMock = $this->getMockBuilder(ResponseInterface::class)
+            ->getMock();
+        $responseMock->method('getStatusCode')->willReturn(422);
+        $responseMock->method('toArray')->willReturn([
+            'ErrorCode' => 123,
+            'Message' => 'Invalid request'
+        ]);
 
-        $mail->setFrom('test');
-        $this->assertEquals('test', $this->transport->getFrom());
-    }
+        $this->httpClientMock->expects($this->once())
+            ->method('request')
+            ->willReturn($responseMock);
 
-    public function testGetTo()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getTo());
-
-        $mail->addTo('test');
-        $this->assertEquals('test', $this->transport->getTo());
-
-        $mail->addTo('test1');
-        $this->assertEquals('test,test1', $this->transport->getTo());
-    }
-
-    public function testGetCc()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getCc());
-
-        $mail->addCc('test');
-        $this->assertEquals('test', $this->transport->getCc());
-
-        $mail->addCc('test1');
-        $this->assertEquals('test,test1', $this->transport->getCc());
-    }
-
-    public function testGetBcc()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getBcc());
-
-        $mail->addBcc('test');
-        $this->assertEquals('test', $this->transport->getBcc());
-
-        $mail->addBcc('test1');
-        $this->assertEquals('test,test1', $this->transport->getBcc());
-    }
-
-    public function testGetReplyTo()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getReplyTo());
-
-        $mail->setReplyTo('test');
-        $this->assertEquals('test', $this->transport->getReplyTo());
-    }
-
-    public function testGetSubject()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getSubject());
-
-        $mail->setSubject('test');
-        $this->assertEquals('test', $this->transport->getSubject());
-    }
-
-    public function testGetBodyHtml()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getBodyHtml());
-
-        $mail->setBodyHtml('test html');
-        $this->assertEquals('test html', $this->transport->getBodyHtml());
-    }
-
-    public function testGetBodyText()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getBodyText());
-
-        $mail->setBodyText('test text');
-        $this->assertEquals('test text', $this->transport->getBodyText());
-    }
-
-    public function testGetTags()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getTags());
-
-        $mail->addHeader('postmark-tag', 'test', true);
-        $this->assertEquals('test', $this->transport->getTags());
-
-        $mail->addHeader('postmark-tag', 'test1', true);
-        $this->assertEquals('test,test1', $this->transport->getTags());
-    }
-
-    public function testGetAttachements()
-    {
-        $mail = new \Laminas_Mail;
-
-        $this->transport->setMail($mail);
-        $this->assertEmpty($this->transport->getAttachments());
-
-        $at = $mail->createAttachment('test');
-        $at->type        = 'image/gif';
-        $at->disposition = Mime::DISPOSITION_INLINE;
-        $at->encoding    = Mime::ENCODING_BASE64;
-        $at->filename    = 'test.gif';
-        $this->transport->setMail($mail);
-
-        $attachements = $this->transport->getAttachments();
-        $this->assertNotEmpty($attachements);
-        $this->assertEquals('image/gif', $attachements[0]['ContentType']);
-        $this->assertEquals('test.gif', $attachements[0]['Name']);
+        $this->transport->send($email);
     }
 }

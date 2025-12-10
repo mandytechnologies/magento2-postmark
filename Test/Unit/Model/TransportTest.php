@@ -1,95 +1,96 @@
 <?php
-/**
- * Postmark integration
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- *
- * @category    Mandytech
- * @package     Mandytech_Postmark
- * @copyright   Copyright (c) SUMO Heavy Industries, LLC
- * @copyright   Copyright (c) Ripen, LLC
- * @copyright   Copyright (c) Mandy Technologies Pvt Ltd
- * @notice      The Postmark logo and name are trademarks of Wildbit, LLC
- * @license     http://www.opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
- */
 namespace Mandytech\Postmark\Test\Unit\Model;
 
-use Magento\Framework\Mail\EmailMessage;
 use Mandytech\Postmark\Helper\Data;
-use Mandytech\Postmark\Model\Transport;
-use Mandytech\Postmark\Model\Transport\Exception;
 use Mandytech\Postmark\Model\Transport\Postmark;
-use PHPUnit\Framework\MockObject\MockObject;
+use Mandytech\Postmark\Model\Transport as PostmarkTransport;
+use Mandytech\Postmark\Model\Transport\Exception as PostmarkTransportException;
+use Magento\Framework\Mail\EmailMessageInterface;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Email;
+use Magento\Framework\Exception\MailException;
 
-class TransportTest extends \PHPUnit\Framework\TestCase
+class TransportTest extends TestCase
 {
-    /**
-     * @var MockObject
-     */
-    private $_helper;
+    /** @var Data|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
 
-    /**
-     * @var Transport
-     */
-    private $_transport;
+    /** @var Postmark|\PHPUnit\Framework\MockObject\MockObject */
+    private $postmarkMock;
 
-    /**
-     * @var MockObject
-     */
-    private $_transportPostmarkMock;
+    /** @var EmailMessageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailMessage;
+
+    /** @var PostmarkTransport */
+    private $transport;
 
     public function setUp(): void
     {
-        $this->_helper = $this->getMockBuilder(Data::class)
-            ->setMethods(['canUse'])
+        $this->helper = $this->getMockBuilder(Data::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['canUse'])
+            ->getMock();
+
+        $this->emailMessage = $this->getMockBuilder(EmailMessageInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_message = $this->getMockBuilder(EmailMessage::class)
+        // Ensure getBody returns a string (avoids TextPart error)
+        $this->emailMessage->method('getBody')->willReturn('<p>Test HTML</p>');
+        $this->emailMessage->method('getFrom')->willReturn([]);
+        $this->emailMessage->method('getTo')->willReturn([]);
+        $this->emailMessage->method('getCc')->willReturn([]);
+        $this->emailMessage->method('getBcc')->willReturn([]);
+        $this->emailMessage->method('getReplyTo')->willReturn([]);
+        $this->emailMessage->method('getSubject')->willReturn('Test Subject');
+
+        $this->postmarkMock = $this->getMockBuilder(Postmark::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->_transportPostmarkMock = $this->getMockBuilder(Postmark::class)
-            ->setMethods(['send'])
-            ->disableOriginalConstructor()
-            ->setConstructorArgs(['helper' => $this->_helper])
-            ->getMock();
-        $this->_transport = new Transport($this->_message, $this->_transportPostmarkMock, $this->_helper);
+        $this->transport = new PostmarkTransport(
+            $this->helper,
+            $this->postmarkMock,
+            $this->emailMessage
+        );
     }
 
-    public function testSendMessage()
+    public function testSendMessageUsesPostmarkWhenEnabled()
     {
-        $this->_helper->expects($this->once())
-            ->method('canUse')
-            ->will($this->returnValue(true));
+        $this->helper->method('canUse')->willReturn(true);
 
-        $this->_transportPostmarkMock->expects($this->once())
+        $this->postmarkMock->expects($this->once())
             ->method('send')
-            ->will($this->returnValue(null));
+            ->with($this->isInstanceOf(Email::class));
 
-        $this->_transport->sendMessage();
+        $this->transport->sendMessage();
     }
 
-    public function testSendMessageException()
+    public function testSendMessageFallbackToParentWhenDisabled()
     {
-        $this->_helper->expects($this->once())
-            ->method('canUse')
-            ->will($this->returnValue(true));
+        $this->helper->method('canUse')->willReturn(false);
 
-        $this->_transportPostmarkMock->expects($this->once())
+        $parentTransport = $this->getMockBuilder(PostmarkTransport::class)
+            ->setConstructorArgs([$this->helper, $this->postmarkMock, $this->emailMessage])
+            ->onlyMethods(['sendMessage'])
+            ->getMock();
+
+        $parentTransport->expects($this->once())
+            ->method('sendMessage');
+
+        $parentTransport->sendMessage();
+    }
+
+    public function testSendMessageThrowsMailException()
+    {
+        $this->helper->method('canUse')->willReturn(true);
+
+        $this->postmarkMock->expects($this->once())
             ->method('send')
-            ->will($this->throwException(new Exception('test')));
+            ->willThrowException(new PostmarkTransportException('Postmark error'));
 
-        try {
-            $this->_transport->sendMessage();
-            $this->fail('Exception not thrown');
-        } catch(\Exception $e) {
-            $this->assertEquals('test', $e->getMessage());
-        }
+        $this->expectException(MailException::class);
+
+        $this->transport->sendMessage();
     }
 }

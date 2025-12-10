@@ -19,79 +19,98 @@
  */
 namespace Mandytech\Postmark\Model;
 
-use Laminas\Mail\Message as LaminasMessage;
-use Laminas\Mail\Headers as LaminasHeaders;
 use Magento\Framework\Exception\MailException;
 use Magento\Framework\Mail\EmailMessageInterface;
+use Magento\Framework\Mail\TransportInterface;
+
 use Mandytech\Postmark\Helper\Data;
 use Mandytech\Postmark\Model\Transport\Postmark;
-use Magento\Framework\Mail\TransportInterface;
+
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\MixedPart;
+use Symfony\Component\Mime\Part\TextPart;
+
 use Throwable;
 
 class Transport extends \Magento\Framework\Mail\Transport implements TransportInterface
 {
-    /**
-     * @var EmailMessageInterface
-     */
+    /** @var EmailMessageInterface */
     protected $message;
 
-    /**
-     * @var Data
-     */
+    /** @var Data */
     protected $helper;
 
-    /**
-     * @var Postmark
-     */
+    /** @var Postmark */
     protected $transportPostmark;
 
-    /**
-     * @param Data $helper
-     * @param Postmark $transportPostmark
-     * @param EmailMessageInterface $message
-     * @param null $parameters
-     */
     public function __construct(
         Data $helper,
         Postmark $transportPostmark,
         EmailMessageInterface $message,
         $parameters = null
     ) {
-        $this->helper  = $helper;
+        $this->helper = $helper;
         $this->transportPostmark = $transportPostmark;
 
-        if ($this->helper->canUse()) {
+        if ($helper->canUse()) {
             $this->message = $message;
         } else {
             parent::__construct($message, $parameters);
         }
     }
 
-    /**
-     * Send a mail using this transport
-     *
-     * @return void
-     * @throws MailException|Throwable
-     */
-    public function sendMessage()
+    public function sendMessage(): void
     {
-        if (! $this->helper->canUse()) {
+        if (!$this->helper->canUse()) {
             parent::sendMessage();
             return;
         }
 
         try {
-            // Create a Laminas\Mail\Message object to pass to Postmark
-            $headers = new LaminasHeaders();
-            $headers->addHeaders($this->message->getHeaders());
-
-            $message = new LaminasMessage();
-            $message->setHeaders($headers);
-            $message->setBody($this->message->getBody());
-
-            $this->transportPostmark->send($message);
-        } catch (\Exception $e) {
-            throw new MailException(new \Magento\Framework\Phrase($e->getMessage()), $e);
+            $email = $this->convertMessageToSymfony($this->message);
+            $this->transportPostmark->send($email);
+        } catch (Throwable $e) {
+            throw new MailException(__($e->getMessage()));
         }
+    }
+
+    private function convertMessageToSymfony(EmailMessageInterface $message): Email
+    {
+        $email = new Email();
+
+        foreach ($message->getFrom() as $from) {
+            $email->from($from->getEmail());
+        }
+
+        foreach ($message->getTo() as $to) {
+            $email->to($to->getEmail());
+        }
+
+        foreach ($message->getCc() ?: [] as $cc) {
+            $email->cc($cc->getEmail());
+        }
+
+        foreach ($message->getBcc() ?: [] as $bcc) {
+            $email->bcc($bcc->getEmail());
+        }
+
+        foreach ($message->getReplyTo() ?: [] as $rt) {
+            $email->replyTo($rt->getEmail());
+        }
+
+        $email->subject($message->getSubject());
+
+        $body = $message->getBody();
+
+        if ($body instanceof \Symfony\Component\Mime\Part\TextPart) {
+            $body = $body->getBody();
+        } elseif (is_object($body) && method_exists($body, 'bodyToString')) {
+            $body = $body->bodyToString();
+        }
+
+        $email->html($body);
+
+        return $email;
     }
 }

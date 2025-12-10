@@ -19,6 +19,6 @@
  */
 namespace Mandytech\Postmark\Model\Transport;
 
-class Exception extends \Laminas\Mail\Exception\RuntimeException
+class Exception extends \RuntimeException
 {
 }
